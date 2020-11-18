@@ -27,6 +27,8 @@ services:
     restart: always
     env_file:
       - ".env"
+    volumes:
+      - .:/src
     # Бот стартует после запуска базы
 #    depends_on:
 #      - db
