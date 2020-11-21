@@ -13,12 +13,14 @@ services:
     networks:
       - botnet
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - ./postgresql:/var/lib/postgresql
   tgbot:
     container_name: bot
     build:
       context: .
     command: python app.py
+    volumes:
+      - .:/src
     networks:
       - botnet
     restart: always
