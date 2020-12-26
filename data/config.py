@@ -12,6 +12,7 @@ admins = [
 ]
 
 ip = os.getenv("ip")
+DATABASE = os.getenv("DATABASE")
 
 aiogram_redis = {
     'host': ip,

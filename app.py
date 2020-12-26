@@ -3,6 +3,8 @@ from utils.set_bot_commands import set_default_commands
 
 
 async def on_startup(dp):
+    await db.create()
+
     import filters
     import middlewares
     filters.setup(dp)

@@ -1,4 +1,4 @@
-import asyncio
+from typing import Union
 
 import asyncpg
 from asyncpg.pool import Pool
@@ -7,17 +7,19 @@ from data import config
 
 
 class Database:
-    def __init__(self, pool):
-        self.pool: Pool = pool
+    def __init__(self):
+        # Создается база данных без подключения в loader
+        self.pool: Union[Pool, None] = None
 
-    @classmethod
-    async def create(cls):
+    async def create(self):
+        # В этой функции создается подключение к базе,
         pool = await asyncpg.create_pool(
-            user=config.PGUSER,
-            password=config.PGPASSWORD,
-            host=config.ip,
+            user=config.PGUSER,  # Пользователь базы (postgres или ваше имя), для которой была создана роль
+            password=config.PGPASSWORD,  # Пароль к пользователю
+            host=config.ip,  # Ip адрес базы данных. Если локальный компьютер - localhost, если докер - название сервиса
+            database=config.DATABASE  # Название базы данных. По умолчанию - postgres, если вы не создавали свою
         )
-        return cls(pool)
+        self.pool = pool
 
     async def create_table_users(self):
         sql = """
