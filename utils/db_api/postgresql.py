@@ -8,11 +8,13 @@ from data import config
 
 class Database:
     def __init__(self):
-        # Создается база данных без подключения в loader
+        """Создается база данных без подключения в loader"""
+
         self.pool: Union[Pool, None] = None
 
     async def create(self):
-        # В этой функции создается подключение к базе,
+        """В этой функции создается подключение к базе"""
+
         pool = await asyncpg.create_pool(
             user=config.PGUSER,  # Пользователь базы (postgres или ваше имя), для которой была создана роль
             password=config.PGPASSWORD,  # Пароль к пользователю
