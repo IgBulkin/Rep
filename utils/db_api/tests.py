@@ -4,6 +4,8 @@ from utils.db_api.postgresql import Database
 
 
 async def test():
+    # Подключаем базу данных (по новому)
+    await db.create()
     print("Создаем таблицу Пользователей...")
     await db.create_table_users()
     print("Готово")
@@ -24,6 +26,5 @@ async def test():
     print(f"Получил пользователя: {user}")
 
 
-loop = asyncio.get_event_loop()
-db = loop.run_until_complete(Database.create())
-loop.run_until_complete(test())
+db = Database()
+asyncio.run(test())
