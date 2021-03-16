@@ -25,7 +25,7 @@ async def enter_test(message: types.Message):
 async def answer_q1(message: types.Message, state: FSMContext):
     answer = message.text
 
-    # Ваирант 2 получения state
+    # Вариант 2 получения state
     # state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
 
     # Вариант 1 сохранения переменных - записываем через key=var
