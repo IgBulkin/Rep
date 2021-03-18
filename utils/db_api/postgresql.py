@@ -1,78 +1,86 @@
 from typing import Union
 
 import asyncpg
+from asyncpg import Connection
 from asyncpg.pool import Pool
 
 from data import config
 
 
 class Database:
-    def __init__(self):
-        """Создается база данных без подключения в loader"""
 
+    def __init__(self):
         self.pool: Union[Pool, None] = None
 
     async def create(self):
-        """В этой функции создается подключение к базе"""
-
-        pool = await asyncpg.create_pool(
-            user=config.PGUSER,  # Пользователь базы (postgres или ваше имя), для которой была создана роль
-            password=config.PGPASSWORD,  # Пароль к пользователю
-            host=config.ip,  # Ip адрес базы данных. Если локальный компьютер - localhost, если докер - название сервиса
-            database=config.DATABASE  # Название базы данных. По умолчанию - postgres, если вы не создавали свою
+        self.pool = await asyncpg.create_pool(
+            user=config.DB_USER,
+            password=config.DB_PASS,
+            host=config.DB_HOST,
+            database=config.DB_NAME
         )
-        self.pool = pool
+
+    async def execute(self, command, *args,
+                      fetch: bool = False,
+                      fetchval: bool = False,
+                      fetchrow: bool = False,
+                      execute: bool = False
+                      ):
+        async with self.pool.acquire() as connection:
+            connection: Connection
+            async with connection.transaction():
+                if fetch:
+                    result = await connection.fetch(command, *args)
+                elif fetchval:
+                    result = await connection.fetchval(command, *args)
+                elif fetchrow:
+                    result = await connection.fetchrow(command, *args)
+                elif execute:
+                    result = await connection.execute(command, *args)
+            return result
 
     async def create_table_users(self):
         sql = """
         CREATE TABLE IF NOT EXISTS Users (
-            id INT NOT NULL,
-            Name varchar(255) NOT NULL,
-            email varchar(255),
-            PRIMARY KEY (id)
-            );
-"""
-        await self.pool.execute(sql)
+        id SERIAL PRIMARY KEY,
+        full_name VARCHAR(255) NOT NULL,
+        username varchar(255) NULL,
+        telegram_id BIGINT NOT NULL UNIQUE 
+        );
+        """
+        await self.execute(sql, execute=True)
 
     @staticmethod
     def format_args(sql, parameters: dict):
         sql += " AND ".join([
-            f"{item} = ${num + 1}" for num, item in enumerate(parameters)
+            f"{item} = ${num}" for num, item in enumerate(parameters.keys(),
+                                                          start=1)
         ])
         return sql, tuple(parameters.values())
 
-    async def add_user(self, id: int, name: str, email: str = None):
-        # SQL_EXAMPLE = "INSERT INTO Users(id, Name, email) VALUES(1, 'John', 'John@gmail.com')"
-
-        sql = """
-        INSERT INTO Users(id, Name, email) VALUES($1, $2, $3)
-        """
-        await self.pool.execute(sql, id, name, email)
+    async def add_user(self, full_name, username, telegram_id):
+        sql = "INSERT INTO users (full_name, username, telegram_id) VALUES($1, $2, $3) returning *"
+        return await self.execute(sql, full_name, username, telegram_id, fetchrow=True)
 
     async def select_all_users(self):
-        sql = """
-        SELECT * FROM Users
-        """
-        return await self.pool.fetch(sql)
+        sql = "SELECT * FROM Users"
+        return await self.execute(sql, fetch=True)
 
     async def select_user(self, **kwargs):
-        # SQL_EXAMPLE = "SELECT * FROM Users where id=1 AND Name='John'"
-        sql = f"""
-        SELECT * FROM Users WHERE 
-        """
+        sql = "SELECT * FROM Users WHERE "
         sql, parameters = self.format_args(sql, parameters=kwargs)
-        return await self.pool.fetchrow(sql, *parameters)
+        return await self.execute(sql, *parameters, fetchrow=True)
 
     async def count_users(self):
-        return await self.pool.fetchval("SELECT COUNT(*) FROM Users")
+        sql = "SELECT COUNT(*) FROM Users"
+        return await self.execute(sql, fetchval=True)
 
-    async def update_user_email(self, email, id):
-        # SQL_EXAMPLE = "UPDATE Users SET email=mail@gmail.com WHERE id=12345"
-
-        sql = f"""
-        UPDATE Users SET email=$1 WHERE id=$2
-        """
-        return await self.pool.execute(sql, email, id)
+    async def update_user_username(self, username, telegram_id):
+        sql = "UPDATE Users SET username=$1 WHERE telegram_id=$2"
+        return await self.execute(sql, username, telegram_id, execute=True)
 
     async def delete_users(self):
-        await self.pool.execute("DELETE FROM Users WHERE TRUE")
+        await self.execute("DELETE FROM Users WHERE TRUE", execute=True)
+
+    async def drop_users(self):
+        await self.execute("DROP TABLE Users", execute=True)

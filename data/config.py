@@ -1,24 +1,14 @@
-import os
+from environs import Env
 
-from dotenv import load_dotenv
+# Теперь используем вместо библиотеки python-dotenv библиотеку environs
+env = Env()
+env.read_env()
 
-load_dotenv()
+BOT_TOKEN = env.str("BOT_TOKEN")  # Забираем значение типа str
+ADMINS = env.list("ADMINS")  # Тут у нас будет список из админов
+IP = env.str("ip")  # Тоже str, но для айпи адреса хоста
 
-BOT_TOKEN = str(os.getenv("BOT_TOKEN"))
-PGUSER = str(os.getenv("PGUSER"))
-PGPASSWORD = str(os.getenv("PGPASSWORD"))
-admins = [
-    362089194
-]
-
-ip = os.getenv("ip")
-DATABASE = os.getenv("DATABASE")
-
-aiogram_redis = {
-    'host': ip,
-}
-
-redis = {
-    'address': (ip, 6379),
-    'encoding': 'utf8'
-}
+DB_USER = env.str("DB_USER")
+DB_PASS = env.str("DB_PASS")
+DB_NAME = env.str("DB_NAME")
+DB_HOST = env.str("DB_HOST")
