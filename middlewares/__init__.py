@@ -1,9 +1,14 @@
-from aiogram import Dispatcher
-
 from .throttling import ThrottlingMiddleware
-from .database import GetDBUser
+from .big_brother import BigBrother
+from .acl import ACLMiddleware
+from .sentinel import SentinelController
+
+from loader import dp
+from .throttling import ThrottlingMiddleware
 
 
-def setup(dp: Dispatcher):
+if __name__ == "middlewares":
     dp.middleware.setup(ThrottlingMiddleware())
-    dp.middleware.setup(GetDBUser())
+    dp.middleware.setup(ACLMiddleware())
+    dp.middleware.setup(BigBrother())
+    dp.middleware.setup(SentinelController())
