@@ -19,8 +19,8 @@ async def bothelp(message: types.Message):
 
 @dp.message_handler(CommandStart(), SomeF())
 async def bot_start(message: types.Message, middleware_data, from_filter):
-    logging.info(f"5. Handler! {middleware_data=}, {from_filter=}")
-    logging.info("Следующая точка: post process message\n")
+    logging.info(f"6. Handler! {middleware_data=}, {from_filter=}")
+    logging.info("Следующая точка: Post process message\n")
 
     await message.answer(f'Привет, {message.from_user.full_name}!\n',
                          reply_markup=InlineKeyboardMarkup(

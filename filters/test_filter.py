@@ -8,7 +8,7 @@ from aiogram.dispatcher.handler import ctx_data
 class SomeF(BoundFilter):
     async def check(self, message: types.Message):
         data = ctx_data.get()
-        logging.info(f"3. Filter {data=}")
-        logging.info("Следующая точка: process message\n")
+        logging.info(f"4. Filter, {data=}")
+        logging.info("Следующая точка: Process message\n")
 
         return {"from_filter": "Из фильтра"}
