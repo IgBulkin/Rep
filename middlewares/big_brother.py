@@ -27,8 +27,8 @@ class BigBrother(BaseMiddleware):
 
     # 3.
     async def on_pre_process_message(self, message: types.Message, data: dict):
-        logging.info(f"2. PRE process message, {data=}")
-        logging.info("Следующая точка: Filters, Process message\n")
+        logging.info(f"3. PRE process message, {data=}")
+        logging.info("Следующая точка: Filter, Process message\n")
         data["middleware_data"] = "Это пройдет в on_process_message"
 
     # 4. Filters
