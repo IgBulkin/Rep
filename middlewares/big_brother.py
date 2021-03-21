@@ -35,7 +35,7 @@ class BigBrother(BaseMiddleware):
 
     # 5.
     async def on_process_message(self, message: types.Message, data: dict):
-        logging.info(f"4. Process message, {data=}")
+        logging.info(f"5. Process message, {data=}")
         logging.info("Следующая точка: handler\n")
         data["middleware_data"] = "Это пройдет в Handler"
 
@@ -43,12 +43,12 @@ class BigBrother(BaseMiddleware):
 
     # 7.
     async def on_post_process_message(self, message: types.Message, data_from_handler: list, data):
-        logging.info(f"6. Post process message, {data=} {data_from_handler=}")
+        logging.info(f"7. Post process message, {data=} {data_from_handler=}")
         logging.info("Следующая точка: Post process Update\n")
 
     # 8.
     async def on_post_process_update(self, update: types.Update, data_from_handler: list, data):
-        logging.info(f"7. Post process update, {data=} {data_from_handler=}")
+        logging.info(f"8. Post process update, {data=} {data_from_handler=}")
         logging.info(f"[----------------------Выход------------------------------]\n")
 
     async def on_pre_process_callback_query(self, cq: types.CallbackQuery, data: dict, *args):
