@@ -15,7 +15,7 @@ async def show_items(message: Message):
                          reply_markup=choice)
 
 
-# Попробуйем отловить по встроенному фильтру, где в нашем call.data содержится "pear"
+# Попробуем отловить по встроенному фильтру, где в нашем call.data содержится "pear"
 @dp.callback_query_handler(text_contains="pear")
 async def buying_pear(call: CallbackQuery):
     # Обязательно сразу сделать answer, чтобы убрать "часики" после нажатия на кнопку.
@@ -51,7 +51,7 @@ async def cancel_buying(call: CallbackQuery):
     # Ответим в окошке с уведомлением!
     await call.answer("Вы отменили эту покупку!", show_alert=True)
 
-    # Вариант 1 - Отправляем пустую клваиатуру изменяя сообщение, для того, чтобы ее убрать из сообщения!
+    # Вариант 1 - Отправляем пустую клавиатуру изменяя сообщение, для того, чтобы ее убрать из сообщения!
     await call.message.edit_reply_markup(reply_markup=None)
 
     # Вариант 2 отправки клавиатуры (по API)
