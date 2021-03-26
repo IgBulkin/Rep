@@ -7,6 +7,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQu
 
 from filters import SomeF
 from loader import dp
+from utils.db_api.models import User
 from utils.misc import rate_limit
 
 
@@ -17,12 +18,10 @@ async def bothelp(message: types.Message):
     await message.answer("/block_me - Заблокироваться, /unblock_me - Разблокироваться")
 
 
+# @rate_limit(5, key="start")
 @dp.message_handler(CommandStart(), SomeF())
-async def bot_start(message: types.Message, middleware_data, from_filter):
-    logging.info(f"6. Handler! {middleware_data=}, {from_filter=}")
-    logging.info("Следующая точка: Post process message\n")
-
-    await message.answer(f'Привет, {message.from_user.full_name}!\n',
+async def bot_start(message: types.Message, middleware_data, from_filter, user: User):
+    await message.answer(f"Привет, {message.from_user.full_name}! \n{middleware_data=} \n{from_filter=}",
                          reply_markup=InlineKeyboardMarkup(
                              inline_keyboard=[
                                  [
@@ -30,5 +29,11 @@ async def bot_start(message: types.Message, middleware_data, from_filter):
                                  ]
                              ]
                          ))
+    logging.info(f"6. Handler")
+    logging.info("Следующая точка: Post Process Message")
+    return {"from_handler": "Данные из хендлера"}
 
-    return {"from_handler": "Данные из хендлера!"}
+
+@dp.callback_query_handler(text="button")
+async def get_button(call: types.CallbackQuery):
+    await call.message.answer("Вы нажали на кнопку")

@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from typing import Union
 
 from aiogram import types, Dispatcher
@@ -29,27 +30,25 @@ class ThrottlingMiddleware(BaseMiddleware):
             await self.target_throttled(target, t, dispatcher, key)
             raise CancelHandler()
 
-    async def on_process_message(self, message: types.Message, data: dict):
-        await self.throttle(message)
-
-    async def on_process_callback_query(self, call: types.CallbackQuery, data: dict):
-        await self.throttle(call)
-
     @staticmethod
-    async def target_throttled(target: Union[types.Message, types.CallbackQuery], throttled: Throttled,
-                               dispatcher, key):
+    async def target_throttled(target: Union[types.Message, types.CallbackQuery],
+                               throttled: Throttled, dispatcher: Dispatcher, key: str):
         msg = target.message if isinstance(target, types.CallbackQuery) else target
-
+        delta = throttled.rate - throttled.delta
         if throttled.exceeded_count == 2:
             await msg.reply('Слишком Часто! Давай не так быстро')
             return
         elif throttled.exceeded_count == 3:
-            await msg.reply("Всё. Больше не отвечу, пока не пройдет 10 сек")
+            await msg.reply(f'Всё. Больше не отвечу, пока не пройдет {delta} секунд')
             return
-
-        delta = throttled.rate - throttled.delta
         await asyncio.sleep(delta)
-        thr = await dispatcher.check_key(key)
 
+        thr = await dispatcher.check_key(key)
         if thr.exceeded_count == throttled.exceeded_count:
-            await msg.reply("Отвечаю.")
+            await msg.reply("Все, теперь отвечаю.")
+
+    async def on_process_message(self, message, data):
+        await self.throttle(message)
+
+    async def on_process_callback_query(self, call, data):
+        await self.throttle(call)

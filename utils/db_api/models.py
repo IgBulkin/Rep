@@ -1,5 +1,5 @@
 class User:
-    users = dict()
+    users = {}
 
     def __init__(self, telegram_id):
         self.telegram_id = telegram_id
@@ -13,6 +13,13 @@ class User:
     def create(cls, telegram_id):
         user = User(telegram_id)
         cls.users[telegram_id] = user
+        return user
+
+    @classmethod
+    def get_or_create(cls, telegram_id):
+        user = cls.get(telegram_id)
+        if user is None:
+            user = cls.create(telegram_id)
         return user
 
     def block(self):
