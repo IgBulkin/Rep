@@ -11,4 +11,7 @@ async def download_document(message: types.Message):
 
     await message.document.download(destination=path_to_download)
     await message.answer(f"Документ был сохранен в путь: {path_to_download}")
+    
+    #  Если хотите отправить файл обратно пользователю:
+    #await message.answer_document(document = types.InputFile(path_to_download))
 
